@@ -11,7 +11,7 @@ from math import floor, ceil
 from typing import TYPE_CHECKING
 
 from worktoy.desc import Field
-from worktoy.utilities import maybe
+from worktoy.utilities import maybe, textFmt
 from worktoy.waitaminute import TypeException
 
 from . import KeyBind, KeyNum
@@ -168,6 +168,7 @@ class Control:
 
   @kp5
   def _snapDown(self, event: KeyEvent, ) -> bool:
+    print("Snap down event received:", event)
     if not event.action:
       return False
     pitch90 = self.pitch + 90
@@ -263,7 +264,9 @@ class Control:
 
   def resolveKeyBind(self, event: KeyEvent) -> None:
     keyBinds = self.getKeyBinds()
-    bind = keyBinds.get(event.key, None)
+    bindFromKey = keyBinds.get(event.key, None)
+    bindFromScanCode = keyBinds.get(event.scan_code, None)
+    bind = maybe(bindFromKey, bindFromScanCode)
     if bind is not None:
       callback = bind.__get__(self, type(self))
       callback(event)
